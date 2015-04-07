@@ -8,9 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.*;
 import java.util.List;
 
-/**
- * Created by Глеб on 11.11.2014.
- */
 @Transactional
 @Repository
 public class UserDaoHibImpl implements UserDao {
@@ -32,8 +29,8 @@ public class UserDaoHibImpl implements UserDao {
     public User find(String login) {
         EntityManager entityManager = factory.createEntityManager();
         Query query = entityManager.createQuery("FROM User u WHERE u.login = '" + login + "'", User.class);
-        User user1 = (User)query.getSingleResult();
-        return user1;
+        User user = (User)query.getSingleResult();
+        return user;
     }
 
     @Override
@@ -50,21 +47,37 @@ public class UserDaoHibImpl implements UserDao {
     @Override
     public boolean update(User user) {
         EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
         em.merge(user);
-        em.getTransaction().commit();
+        transaction.commit();
         return true;
     }
+
+    /*em.getTransaction().begin();
+        Query query = em.createQuery("UPDATE User u SET u.login = :login, u.pass = :pass WHERE u.id = :id");
+        int k = query.setParameter("login", user.getLogin()).setParameter("pass", user.getPass()).setParameter("id", user.getId()).executeUpdate();
+        /*if (findById(user.getId()) != null) {
+            em.merge(user);
+            em.getTransaction().commit();
+            return true;
+        }
+        return false;*/
 
     @Override
     public boolean delete(String login) {
         EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        em.remove(find(login));
+        transaction.commit();
+        return true;
+        /*em.getTransaction().begin();
         Query query = em.createQuery("DELETE User u WHERE u.login = :login");
         int k = query.setParameter("login", login).executeUpdate();
         //em.remove((User)find(login));
         em.getTransaction().commit();
-        return true;
+        return true;*/
     }
 
     @Override

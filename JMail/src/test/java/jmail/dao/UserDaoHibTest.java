@@ -29,36 +29,36 @@ public class UserDaoHibTest {
 
     @Test
     public void addUser() {
-        String loginUser1 = "Katay";//UUID.randomUUID().toString();
+        String loginUser1 = UUID.randomUUID().toString();
         String loginUser2 = UUID.randomUUID().toString();
         user1 = userDao.create(new User(loginUser1, "1234"));
         user2 = userDao.create(new User(loginUser2, "4321"));
     }
 
-    @Test
+    //@Test
     public void findById() {
         User user = userDao.findById(21);
         System.out.println(user);
     }
-    @Test
+    //@Test
     public void find() {
-        User user = userDao.find("Katay");
+        User user = userDao.find("44d94f20-7e00-4e9c-8228-eef48f18f4d1");
         System.out.println(user);
     }
 
     @Test
     public void delete() {
-        boolean bool = userDao.delete("Katay");
+        boolean bool = userDao.delete("44d94f20-7e00-4e9c-8228-eef48f18f4d1");
         System.out.println(bool);
     }
 
-    @Test
+    //@Test
     public void update() {
-        boolean bool = userDao.update(new User(7, "Kolay", "lala"));
+        boolean bool = userDao.update(new User(55, "Sergey", "lala"));
         System.out.println(bool);
     }
 
-    @Test
+    //@Test
     public void getAll() {
         List<User> allUsers = userDao.all();
         for(User u : allUsers) {

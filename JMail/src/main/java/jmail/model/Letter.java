@@ -1,17 +1,21 @@
 package jmail.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Глеб on 11.11.2014.
  */
 @Entity
 @Table(name = "letters")
+@NamedQuery(name = "All_letters", query = "FROM Letter")
 public class Letter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "letter_id")
     private int id;
     private String title;
     private String body;
@@ -23,7 +27,7 @@ public class Letter {
     @ManyToOne
     @JoinColumn(name = "from_user", referencedColumnName = "user_id")
     private User from;
-
+    @Column(name = "send_date")
     private Date date;
 
     public Letter(){}
@@ -93,8 +97,45 @@ public class Letter {
         this.date = date;
     }
 
+    public static List<Letter> searchByKeyWord(List<Letter> letters, String keyWord) {
+        List<Letter> list = new ArrayList<>();
+        for (Letter letter : letters) {
+            String body = letter.getBody();
+            if(IsEmptykeyWord(body, keyWord)) {
+                list.add(letter);
+            }
+        }
+        return list;
+    }
+
+    private static boolean IsEmptykeyWord(String body, String key) {
+        char[] mas_body = body.toLowerCase().toCharArray();
+        char[] mas_key = key.toLowerCase().toCharArray();
+        int k = 0;
+        for(int i = 0; i < mas_body.length; i++) {
+            if(mas_body[i] == mas_key[k]) {
+                if(helpIsEmpty(mas_body, mas_key, i, k)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean helpIsEmpty(char[] body, char[] key, int i, int j) {
+        if(i < body.length && j < key.length) {
+            if(body[i] == key[j]) {
+                return helpIsEmpty(body, key, ++i, ++j);
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return "Letter{" +
                 "id=" + id +
                 ", title='" + title + '\'' +

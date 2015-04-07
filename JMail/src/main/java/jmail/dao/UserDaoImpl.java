@@ -13,6 +13,9 @@ import java.util.NoSuchElementException;
  * Created by Глеб on 11.11.2014.
  */
 public class UserDaoImpl implements UserDao{
+
+    //private LetterDao letterDao;// = new LetterDaoImpl();
+
     @Override
     public User findById(int id) {
         User user = null;
@@ -48,7 +51,7 @@ public class UserDaoImpl implements UserDao{
         while (rs.next()){
             return new User(rs.getInt("user_id"), rs.getString("login"), rs.getString("pass"));
         }
-        throw new NoSuchElementException();// write own checked exception
+        throw new NoSuchElementException();
     }
 
     @Override
@@ -86,14 +89,46 @@ public class UserDaoImpl implements UserDao{
     public boolean delete(String login) {
         PreparedStatement preparedStatement = null;
         try(Connection connection = DBConnectionFactory.getConnection()) {
-            preparedStatement = connection.prepareStatement("DELETE FROM users where login = ?");
+            User user = find(login);
+            deleteUserInLetter(connection, user, "SELECT letter_id FROM letters WHERE to_user = " + user.getId(), "UPDATE letters SET to_user = 0 WHERE letter_id = ?");
+            deleteUserInLetter(connection, user, "SELECT letter_id FROM letters WHERE from_user = " + user.getId(), "UPDATE letters SET from_user = 0 WHERE letter_id = ?");
+            preparedStatement = connection.prepareStatement("DELETE FROM users WHERE login = ?");
             preparedStatement.setString(1, login);
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return true;
     }
+
+    private void deleteUserInLetter(Connection connection, User user, String selectSql, String updateSql) {
+        PreparedStatement preparedStatement1 = null;
+            try {
+                for (int i : helpDelete(connection, selectSql)) {
+                    preparedStatement1 = connection.prepareStatement(updateSql);
+                    preparedStatement1.setInt(1, i);
+                    preparedStatement1.executeUpdate();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+    }
+
+    private List<Integer> helpDelete(Connection connection, String sql) {
+        Statement statement = null;
+        List<Integer> letter_id = new ArrayList<>();
+        try {
+            statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                letter_id.add(resultSet.getInt("letter_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return letter_id;
+    }
+
 
     @Override
     public List<User> all() {

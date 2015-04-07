@@ -1,6 +1,7 @@
 package jmail.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,12 +9,11 @@ import java.util.List;
  */
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = {"login"}))
-@NamedQuery(name = "User.getAll", query = "SELECT u FROM User u")
+@NamedQuery(name = "User.getAll", query = "FROM User")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "user_id")
     private int id;
     @Column(name = "login", unique = true)
@@ -21,10 +21,10 @@ public class User {
     private String pass;
 
     @OneToMany(mappedBy = "to")
-    private List<Letter> send;
+    private List<Letter> send = new ArrayList<>();
 
     @OneToMany(mappedBy = "from")
-    private List<Letter> received;
+    private List<Letter> received = new ArrayList<>();
 
     public User() {}
 
@@ -80,13 +80,13 @@ public class User {
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return "User{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
                 ", pass='" + pass + '\'' +
-                ", send=" + send +
-                ", received=" + received +
+                //", send=" + send +
+                //", received=" + received +
                 '}';
     }
 }

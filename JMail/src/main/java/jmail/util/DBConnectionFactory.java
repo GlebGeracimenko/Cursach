@@ -39,8 +39,6 @@ public class DBConnectionFactory {
                 e.printStackTrace();
             }
         }
-
-
         return DriverManager.getConnection(String.format("jdbc:mysql://%s:%s/%s", INSTANCE.HOST, INSTANCE.PORT, "jmail"),
                 INSTANCE.USER, INSTANCE.PASS);
     }
