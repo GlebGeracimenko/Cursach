@@ -1,5 +1,6 @@
 package jmail.dao;
 
+import jmail.model.Letter;
 import jmail.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -64,20 +65,21 @@ public class UserDaoHibImpl implements UserDao {
         }
         return false;*/
 
+
     @Override
+    //@Transactional
     public boolean delete(String login) {
         EntityManager em = factory.createEntityManager();
+        User user = find(login);
+        Query query1 = em.createQuery("UPDATE Letter l SET l.to.id = 0 WHERE l.to.id = " + user.getId(), Letter.class);
+        query1.executeUpdate();
+        Query query2 = em.createQuery("UPDATE Letter l SET l.from.id = 0 WHERE l.from.id = " + user.getId(), Letter.class);
+        query2.executeUpdate();
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
-        em.remove(find(login));
+        em.remove(em.contains(user) ? user : em.merge(user));
         transaction.commit();
         return true;
-        /*em.getTransaction().begin();
-        Query query = em.createQuery("DELETE User u WHERE u.login = :login");
-        int k = query.setParameter("login", login).executeUpdate();
-        //em.remove((User)find(login));
-        em.getTransaction().commit();
-        return true;*/
     }
 
     @Override

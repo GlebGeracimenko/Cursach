@@ -35,12 +35,13 @@ public class UserDaoHibTest {
         user2 = userDao.create(new User(loginUser2, "4321"));
     }
 
-    //@Test
+    @Test
     public void findById() {
         User user = userDao.findById(21);
         System.out.println(user);
     }
-    //@Test
+
+    @Test
     public void find() {
         User user = userDao.find("44d94f20-7e00-4e9c-8228-eef48f18f4d1");
         System.out.println(user);
@@ -48,17 +49,17 @@ public class UserDaoHibTest {
 
     @Test
     public void delete() {
-        boolean bool = userDao.delete("44d94f20-7e00-4e9c-8228-eef48f18f4d1");
+        boolean bool = userDao.delete("Podlesniy");
         System.out.println(bool);
     }
 
-    //@Test
+    @Test
     public void update() {
-        boolean bool = userDao.update(new User(55, "Sergey", "lala"));
+        boolean bool = userDao.update(new User(150, "Sergey12345", "lala"));
         System.out.println(bool);
     }
 
-    //@Test
+    @Test
     public void getAll() {
         List<User> allUsers = userDao.all();
         for(User u : allUsers) {

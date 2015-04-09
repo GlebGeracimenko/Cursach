@@ -114,7 +114,7 @@ public class Letter {
         int k = 0;
         for(int i = 0; i < mas_body.length; i++) {
             if(mas_body[i] == mas_key[k]) {
-                if(helpIsEmpty(mas_body, mas_key, i, k)) {
+                if(helpIsEmpty(mas_body, mas_key, i, k, 0)) {
                     return true;
                 }
             }
@@ -122,15 +122,19 @@ public class Letter {
         return false;
     }
 
-    private static boolean helpIsEmpty(char[] body, char[] key, int i, int j) {
+    private static boolean helpIsEmpty(char[] body, char[] key, int i, int j, int count) {
         if(i < body.length && j < key.length) {
             if(body[i] == key[j]) {
-                return helpIsEmpty(body, key, ++i, ++j);
+                return helpIsEmpty(body, key, ++i, ++j, ++count);
             } else {
                 return false;
             }
         } else {
-            return true;
+            if(count == key.length) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

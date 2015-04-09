@@ -82,8 +82,8 @@ public class LetterDaoImpl implements LetterDao {
             preparedStatement.setInt(4, letter.getFrom().getId());
             preparedStatement.setDate(5, new java.sql.Date(System.currentTimeMillis()));
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.executeQuery("SELECT letter_id FROM letters");
-            while (resultSet.next()) {
+            ResultSet resultSet = preparedStatement.executeQuery("SELECT MAX(letter_id) FROM letters");
+            if (resultSet.next()) {
                 letter.setId(resultSet.getInt("letter_id"));
             }
             //from == send && to == received

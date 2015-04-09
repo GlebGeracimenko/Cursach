@@ -21,10 +21,10 @@ public class User {
     private String pass;
 
     @OneToMany(mappedBy = "to")
-    private List<Letter> send = new ArrayList<>();
+    private List<Letter> send;
 
     @OneToMany(mappedBy = "from")
-    private List<Letter> received = new ArrayList<>();
+    private List<Letter> received;
 
     public User() {}
 
