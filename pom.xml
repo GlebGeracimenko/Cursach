@@ -5,12 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ua.artcode</groupId>
-    <artifactId>ACP2</artifactId>
+    <artifactId>IO34</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
     <modules>
         <module>JMail</module>
-        <module>ChatProject</module>
     </modules>
 
     <properties>
