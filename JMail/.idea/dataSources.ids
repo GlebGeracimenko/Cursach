@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="MySQL - jmail@localhost" uuid="3b519e36-433f-46c2-990a-8d23a4e5128d">
+    <database-info product="MySQL" version="5.5.41-0ubuntu0.14.04.1" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.34 ( Revision: jess.balint@oracle.com-20141014163213-wqbwpf1ok2kvo1om )">
+      <extra-name-characters>#@</extra-name-characters>
+      <identifier-quote-string>`</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact"/>
+    <schema name="" catalog="jmail"/>
+    <table name="letters" schema="" catalog="jmail" type="TABLE">
+      <column name="letter_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="title" sqlType="VARCHAR" precision="100" scale="0" nullable="true" jdbcType="12"/>
+      <column name="body" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
+      <column name="to_user" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="from_user" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="send_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <primary-key name="PRIMARY" columns="letter_id"/>
+      <foreign-key name="letters_ibfk_1" columns="to_user" ref-table="users" ref-schema="" ref-catalog="jmail" ref-columns="user_id" update-rule="0" delete-rule="3" deferrability="2"/>
+      <foreign-key name="letters_ibfk_2" columns="from_user" ref-table="users" ref-schema="" ref-catalog="jmail" ref-columns="user_id" update-rule="0" delete-rule="3" deferrability="2"/>
+    </table>
+    <table name="users" schema="" catalog="jmail" type="TABLE">
+      <column name="user_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="login" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
+      <column name="pass" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
+      <primary-key name="PRIMARY" columns="user_id"/>
+      <exported-key name="letters_ibfk_1" table="letters" schema="" catalog="jmail" columns="to_user"/>
+      <exported-key name="letters_ibfk_2" table="letters" schema="" catalog="jmail" columns="from_user"/>
+      <index name="login" unique="true" columns="login"/>
+    </table>
+  </data-source>
+</component>
