@@ -49,7 +49,7 @@ public class UserDaoHibTest {
 
     @Test
     public void delete() {
-        boolean bool = userDao.delete("Podlesniy");
+        boolean bool = userDao.delete("Sergey");
         System.out.println(bool);
     }
 

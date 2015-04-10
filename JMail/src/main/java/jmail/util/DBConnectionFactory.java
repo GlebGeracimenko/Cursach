@@ -29,7 +29,7 @@ public class DBConnectionFactory {
         if(INSTANCE == null) {
             Properties properties = new Properties();
             try {
-                properties.load(new FileInputStream("JMail/src/main/resources/db.properties"));
+                properties.load(new FileInputStream("/media/gleb/10585F7C585F5F90/Универ/JMail/src/main/resources/db.properties"));
                 String host = properties.getProperty("jdbc.host");
                 String port = properties.getProperty("jdbc.port");
                 String user = properties.getProperty("jdbc.user");

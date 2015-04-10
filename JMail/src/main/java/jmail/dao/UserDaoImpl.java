@@ -2,6 +2,7 @@ package jmail.dao;
 
 import jmail.model.User;
 import jmail.util.DBConnectionFactory;
+import org.apache.log4j.Logger;
 
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;

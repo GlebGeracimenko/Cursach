@@ -132,23 +132,22 @@ public class LetterDaoImpl implements LetterDao {
     }
 
     @Override
-    public List<Letter> allByUserLogin(String login) {
+    public List<Letter> allByUserLogin(String login) throws SQLException {
         User user = userDao.find(login);
-        List<Letter> letters = allByUserIdHelper(user.getId(), "SELECT * FROM letters WHERE from_user = ?");
-        letters.addAll(allByUserIdHelper(user.getId(), "SELECT * FROM letters WHERE to_user = ?"));
+        List<Letter> letters = allByUserId(user.getId());
         return letters;
     }
 
     @Override
-    public List<Letter> allByUserLoginSend(String login) {
+    public List<Letter> allByUserLoginSend(String login) throws SQLException {
         User user = userDao.find(login);
-        return allByUserIdHelper(user.getId(), "SELECT * FROM letters WHERE from_user = ?");
+        return allByUserIdSend(user.getId());
     }
 
     @Override
-    public List<Letter> allByUserLoginReceived(String login) {
+    public List<Letter> allByUserLoginReceived(String login) throws SQLException {
         User user = userDao.find(login);
-        return allByUserIdHelper(user.getId(), "SELECT * FROM letters WHERE to_user = ?");
+        return allByUserId(user.getId());
     }
 
     @Override
