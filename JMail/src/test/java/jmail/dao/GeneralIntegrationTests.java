@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,18 +44,18 @@ public class GeneralIntegrationTests {
         Assert.assertNotNull(userDao.find(user2.getLogin()));
         Assert.assertNotNull(userDao.findById(user1.getId()));
         Assert.assertNotNull(userDao.findById(user2.getId()));
-        letter = letterDao.create(new Letter("Message", "Hello", user1, user2, new Date()));
+        letter = letterDao.create(new Letter("Message", "Hello", user1, user2, new Timestamp(new Date().getTime())));
     }
 
-    @Test
+    //@Test
     public void delete() {
-        userDao.delete("Podlesniy");
+        userDao.delete(user2.getLogin());
         letterDao.delete(letter.getId());
     }
 
     @Test
     public void update() {
-        user1.setLogin("Kolay");
+        user1.setLogin(user1.getLogin() + "Kolay");
         userDao.update(user1);
         letter.setBody("OpaCHA");
         letterDao.update(letter);
@@ -62,13 +63,13 @@ public class GeneralIntegrationTests {
 
     @Test
     public void find() {
-        userDao.find("Sergey");
+        userDao.find(user1.getLogin());
     }
 
     @Test
     public void findById() {
-        userDao.findById(10);
-        letterDao.findById(6);
+        userDao.findById(user1.getId());
+        letterDao.findById(letter.getId());
     }
 
     @Test
@@ -81,11 +82,7 @@ public class GeneralIntegrationTests {
 
     @Test
     public void findByDateRange() {
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.set(2015, Calendar.APRIL, 10, 12, 33, 0);
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.set(2015, Calendar.APRIL, 10, 12, 33, 38);
-        List<Letter> letters = letterDao.findByDateRange(new Date(calendar1.getTimeInMillis()), new Date(calendar2.getTimeInMillis()), 3);
+        List<Letter> letters = letterDao.findByDateRange(new Date(letter.getTimestamp().getTime()), new Date(System.currentTimeMillis()), 3);
         for (Letter letter1 : letters) {
             System.out.println("FindByDateRange: " + letter1);
         }
@@ -102,7 +99,7 @@ public class GeneralIntegrationTests {
     @Test
     public void allByUserLogin() {
         try {
-            List<Letter> letters = letterDao.allByUserLogin("Sergey");
+            List<Letter> letters = letterDao.allByUserLogin(user1.getLogin());
             for (Letter letter1 : letters) {
                 System.out.println("AllByUserLogin: " + letter1);
             }

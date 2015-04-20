@@ -1,7 +1,9 @@
 package jmail.dao;
 
 import jmail.model.Letter;
+import jmail.model.User;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,10 +40,8 @@ public class LetterDaoHibTest {
         String title2 = "title2";
         String message1 = UUID.randomUUID().toString();
         String message2 = UUID.randomUUID().toString();
-        if(letter1 == null && letter2 == null) {
-            letter1 = letterDao.create(new Letter(title1, message1, userDao.findById(2), userDao.findById(3), new Date()));
-            letter2 = letterDao.create(new Letter(title2, message2, userDao.findById(3), userDao.findById(2), new Date()));
-        }
+        letter1 = letterDao.create(new Letter(title1, message1, userDao.findById(4), userDao.findById(3), new Timestamp(new Date().getTime())));
+        letter2 = letterDao.create(new Letter(title2, message2, userDao.findById(3), userDao.findById(4), new Timestamp(new Date().getTime())));
     }
 
     @Test
@@ -50,7 +51,7 @@ public class LetterDaoHibTest {
 
     @Test
     public void findByKeyWord() {
-        List<Letter> letters = letterDao.findByKeyWord("4071", 2);
+        List<Letter> letters = letterDao.findByKeyWord("Ch", 22);
         System.out.println("*********FindByKeyWord*********");
         for(Letter letter : letters) {
             System.out.println(letter);
@@ -60,11 +61,7 @@ public class LetterDaoHibTest {
 
     @Test
     public void findByDateRange() {
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.set(2015, Calendar.MARCH, 25, 0, 0, 0);
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.set(2015, Calendar.APRIL, 07, 16, 47, 43);
-        List<Letter> letters = letterDao.findByDateRange(new Date(calendar1.getTimeInMillis()), new Date(calendar2.getTimeInMillis()), 2);
+        List<Letter> letters = letterDao.findByDateRange(new Date(letter1.getTimestamp().getTime()), new Date(System.currentTimeMillis()), letter1.getFrom().getId());
         System.out.println("*********FindByDateRange*********");
         for(Letter letter : letters) {
             System.out.println(letter);
@@ -75,7 +72,8 @@ public class LetterDaoHibTest {
     @Test
     public void update() {
         letter2.setBody("UPDATE");
-        //letter2.setId(2);
+        User user = userDao.findById(0);
+        letter2.setFrom(user);
         letterDao.update(letter2);
     }
 
@@ -88,7 +86,7 @@ public class LetterDaoHibTest {
     @Test
     public void allByUserLogin() {
         try {
-            List<Letter> letters = letterDao.allByUserLogin("Sergey");
+            List<Letter> letters = letterDao.allByUserIdSend(3);
             System.out.println("**********AllByUserLogin**********");
             for(Letter letter : letters) {
                 System.out.println(letter);

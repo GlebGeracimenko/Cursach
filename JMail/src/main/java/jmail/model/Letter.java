@@ -1,6 +1,9 @@
 package jmail.model;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,19 +23,19 @@ public class Letter {
     private String title;
     private String body;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne//(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "to_user", referencedColumnName = "user_id")
     private User to;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne//(cascade = {CascadeType.ALL})
     @JoinColumn(name = "from_user", referencedColumnName = "user_id")
     private User from;
     @Column(name = "send_date")
-    private Date date;
+    private Timestamp date;
 
     public Letter(){}
 
-    public Letter(int id, String title, String body, User to, User from, Date date) {
+    public Letter(int id, String title, String body, User to, User from, Timestamp date) {
         this.id = id;
         this.title = title;
         this.body = body;
@@ -41,7 +44,7 @@ public class Letter {
         this.date = date;
     }
 
-    public Letter(String title, String body, User to, User from, Date date) {
+    public Letter(String title, String body, User to, User from, Timestamp date) {
         this.title = title;
         this.body = body;
         this.to = to;
@@ -89,11 +92,11 @@ public class Letter {
         this.from = from;
     }
 
-    public Date getDate() {
+    public Timestamp getTimestamp() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setTimestamp(Timestamp date) {
         this.date = date;
     }
 

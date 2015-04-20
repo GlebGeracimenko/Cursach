@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.sql.SQLException;
 import java.util.List;
 
 @Transactional
@@ -46,7 +47,7 @@ public class UserDaoHibImpl implements UserDao {
     }
 
     @Override
-    @Transactional
+    //@Transactional
     public boolean update(User user) {
         EntityManager em = factory.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
@@ -70,19 +71,40 @@ public class UserDaoHibImpl implements UserDao {
     @Override
     @Transactional
     public boolean delete(String login) {
-        EntityManager em = factory.createEntityManager();
         User user = find(login);
-        Query query1 = em.createQuery("UPDATE Letter l SET l.to.id = 0 WHERE l.to.id = :ID");
-        query1.setParameter("ID", user.getId());
-        query1.executeUpdate();
-        Query query2 = em.createQuery("UPDATE Letter l SET l.from.id = 0 WHERE l.from.id = :ID");
-        query2.setParameter("ID", user.getId());
-        query2.executeUpdate();
+        deleteHelper(user);
+        EntityManager em = factory.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
         em.remove(em.contains(user) ? user : em.merge(user));
         transaction.commit();
         return true;
+    }
+
+
+    private void deleteHelper(User user) {
+        LetterDaoHibImpl letterDaoHib = new LetterDaoHibImpl();
+        letterDaoHib.setFactory(factory);
+        User userDelete = findById(0);
+        List<Letter> letters = null;
+        try {
+            letters = letterDaoHib.allByUserIdSend(user.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (Letter letter : letters) {
+                letter.setFrom(userDelete);
+                letterDaoHib.update(letter);
+        }
+        try {
+            letters = letterDaoHib.allByUserIdReceived(user.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (Letter letter : letters) {
+                letter.setTo(userDelete);
+                letterDaoHib.update(letter);
+        }
     }
 
     @Override

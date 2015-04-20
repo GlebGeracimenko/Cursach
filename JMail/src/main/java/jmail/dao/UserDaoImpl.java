@@ -49,7 +49,7 @@ public class UserDaoImpl implements UserDao{
 
     public User getFromResultSet(ResultSet rs) throws SQLException {
 
-        while (rs.next()){
+        if (rs.next()) {
             return new User(rs.getInt("user_id"), rs.getString("login"), rs.getString("pass"));
         }
         throw new NoSuchElementException();
@@ -79,7 +79,7 @@ public class UserDaoImpl implements UserDao{
             preparedStatement.setString(1, user.getLogin());
             preparedStatement.setString(2, user.getPass());
             preparedStatement.setInt(3, user.getId());
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -138,8 +138,10 @@ public class UserDaoImpl implements UserDao{
         try(Connection connection = DBConnectionFactory.getConnection()) {
             preparedStatement = connection.prepareStatement("SELECT * FROM users");
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
-                list.add(new User(resultSet.getString("login"), resultSet.getString("pass")));
+            User user = null;
+            while (resultSet.next()) {
+                resultSet.previous();
+                list.add(getFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -26,7 +26,7 @@ CREATE  TABLE IF NOT EXISTS `jmail`.`letters` (
   `body` VARCHAR(255) NULL DEFAULT NULL ,
   `to_user` INT(11) NOT NULL ,
   `from_user` INT(11) NOT NULL ,
-  `send_date` DATETIME NULL DEFAULT NULL ,
+  `send_date` TIMESTAMP NOT NULL ,
   PRIMARY KEY (`letter_id`) ,
   INDEX `to_user` (`to_user` ASC) ,
   INDEX `from_user` (`from_user` ASC) ,

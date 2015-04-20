@@ -27,7 +27,7 @@ public class UserDaoHibTest {
     private User user1 = null;
     private User user2 = null;
 
-    //@Test
+    //@Before
     public void addUser() {
         String loginUser1 = UUID.randomUUID().toString();
         String loginUser2 = UUID.randomUUID().toString();
@@ -37,26 +37,26 @@ public class UserDaoHibTest {
 
     //@Test
     public void findById() {
-        User user = userDao.findById(21);
+        User user = userDao.findById(user1.getId());
         System.out.println(user);
     }
 
     //@Test
     public void find() {
-        User user = userDao.find("Sergey");
+        User user = userDao.find(user1.getLogin());
         System.out.println(user);
     }
 
-    @Test
+    //@Test
     public void delete() {
-        boolean bool = userDao.delete("Sergey");
+        boolean bool = userDao.delete(user2.getLogin());
         System.out.println(bool);
     }
 
-    //@Test
+    @Test
     public void update() {
-        boolean bool = userDao.update(new User(7, "USER1", "1234"));
-        System.out.println(bool);
+        boolean bool = userDao.update(new User(8, "USER15", "1234"));
+        System.out.println("Update: " + bool);
     }
 
     //@Test

@@ -20,10 +20,10 @@ public class User {
     private String login;
     private String pass;
 
-    @OneToMany(mappedBy = "to", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "to")//, cascade = {CascadeType.ALL})
     private List<Letter> send;
 
-    @OneToMany(mappedBy = "from", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "from")//, cascade = {CascadeType.ALL})
     private List<Letter> received;
 
     public User() {}

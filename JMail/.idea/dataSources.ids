@@ -13,7 +13,7 @@
       <column name="body" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
       <column name="to_user" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="from_user" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
-      <column name="send_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="send_date" sqlType="TIMESTAMP" precision="19" scale="0" nullable="false" jdbcType="93" def="Q1VSUkVOVF9USU1FU1RBTVA=" version="true"/>
       <primary-key name="PRIMARY" columns="letter_id"/>
       <foreign-key name="letters_ibfk_1" columns="to_user" ref-table="users" ref-schema="" ref-catalog="jmail" ref-columns="user_id" update-rule="0" delete-rule="3" deferrability="2"/>
       <foreign-key name="letters_ibfk_2" columns="from_user" ref-table="users" ref-schema="" ref-catalog="jmail" ref-columns="user_id" update-rule="0" delete-rule="3" deferrability="2"/>

@@ -1,14 +1,12 @@
 package jmail.dao;
 
-import com.oracle.deploy.update.UpdateCheck;
-import com.sun.org.apache.xpath.internal.operations.Lte;
 import jmail.model.Letter;
 import jmail.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import javax.swing.text.html.parser.Entity;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -16,6 +14,7 @@ import java.util.*;
 /**
  * Created by Глеб on 11.11.2014.
  */
+@Transactional
 @Repository
 public class LetterDaoHibImpl implements LetterDao {
 
@@ -28,9 +27,14 @@ public class LetterDaoHibImpl implements LetterDao {
 
     }
 
-
     @Autowired
     private EntityManagerFactory factory;
+
+    //private EntityManager entityManager = factory.createEntityManager();
+
+    public void setFactory(EntityManagerFactory factory) {
+        this.factory = factory;
+    }
 
     @Autowired
     private UserDao userDao;
@@ -51,7 +55,6 @@ public class LetterDaoHibImpl implements LetterDao {
         List<Letter> letters = null;
         try {
             letters = allByUserId(id_user);
-            Collections.sort(letters, new Sort());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -69,7 +72,7 @@ public class LetterDaoHibImpl implements LetterDao {
         timestamp.setNanos(0);
         while(iter.hasNext()) {
             letter = iter.next();
-            if(letter.getDate().compareTo(timestamp) == 1 || letter.getDate().compareTo(timestamp) == 0) {
+            if(letter.getTimestamp().compareTo(timestamp) == 1 || letter.getTimestamp().compareTo(timestamp) == 0) {
                 return count;
             }
             count++;
@@ -83,7 +86,7 @@ public class LetterDaoHibImpl implements LetterDao {
         timestamp.setNanos(0);
         for(int i = letters.size() - 1; i >= 0; i--) {
             letter = letters.get(i);
-            if (letter.getDate().compareTo(timestamp) == -1 || letter.getDate().compareTo(timestamp) == 0) {
+            if (letter.getTimestamp().compareTo(timestamp) == -1 || letter.getTimestamp().compareTo(timestamp) == 0) {
                 return i;
             }
         }
@@ -104,6 +107,7 @@ public class LetterDaoHibImpl implements LetterDao {
 
 
     @Override
+    @Transactional
     public Letter create(Letter letter) {
         EntityManager entityManager = factory.createEntityManager();
         entityManager.getTransaction().begin();
@@ -113,15 +117,28 @@ public class LetterDaoHibImpl implements LetterDao {
     }
 
     @Override
+    @Transactional
     public void update(Letter letter) {
         EntityManager entityManager = factory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
+        letter = updateHelper(letter, entityManager);
         transaction.begin();
         entityManager.merge(letter);
         transaction.commit();
     }
 
+    private Letter updateHelper(Letter letter, EntityManager entityManager) {
+        Letter l = findById(letter.getId());
+        l.setTitle(letter.getTitle());
+        l.setBody(letter.getBody());
+        l.setTo(entityManager.find(User.class, letter.getTo().getId()));
+        l.setFrom(entityManager.find(User.class, letter.getFrom().getId()));
+        l.setTimestamp(letter.getTimestamp());
+        return l;
+    }
+
     @Override
+    @Transactional
     public void delete(int id) {
         EntityManager entityManager = factory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
@@ -134,27 +151,27 @@ public class LetterDaoHibImpl implements LetterDao {
     @Override
     public List<Letter> allByUserLogin(String login) throws SQLException {
         User user = userDao.find(login);
-        List<Letter> letters = allByUserIdHelper("FROM Letter WHERE from_user = ", user.getId());
-        letters.addAll(allByUserIdHelper("FROM Letter WHERE to_user = ", user.getId()));
+        List<Letter> letters = allByUserId(user.getId());
         return letters;
     }
 
     @Override
     public List<Letter> allByUserLoginSend(String login) throws SQLException {
         User user = userDao.find(login);
-        return allByUserIdHelper("FROM Letter WHERE from_user = ", user.getId());
+        return allByUserIdSend(user.getId());
     }
 
     @Override
     public List<Letter> allByUserLoginReceived(String login) throws SQLException {
         User user = userDao.find(login);
-        return allByUserIdHelper("FROM Letter WHERE to_user = ", user.getId());
+        return allByUserIdReceived(user.getId());
     }
 
     @Override
     public List<Letter> allByUserId(int id) throws SQLException {
         List<Letter> letters = allByUserIdHelper("FROM Letter WHERE from_user = ", id);
         letters.addAll(allByUserIdHelper("FROM Letter WHERE to_user = ", id));
+        Collections.sort(letters, new Sort());
         return letters;
     }
 

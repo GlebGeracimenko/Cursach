@@ -1,18 +1,26 @@
 package jmail.dao;
 
 import jmail.model.Letter;
-import jmail.model.User;
 import jmail.util.DBConnectionFactory;
+import org.hibernate.annotations.GenerationTime;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
 
 public class LetterDaoImpl implements LetterDao {
 
 
     private UserDao userDao = new UserDaoImpl();
+
+    private class Sort implements Comparator<Letter> {
+
+        @Override
+        public int compare(Letter o1, Letter o2) {
+            return o1.getId() - o2.getId();
+        }
+
+    }
 
     @Override
     public Letter findById(int id) {
@@ -33,7 +41,7 @@ public class LetterDaoImpl implements LetterDao {
 
     private Letter getLetter(ResultSet resultSet) throws SQLException {
         return new Letter(resultSet.getInt("letter_id"), resultSet.getString("title"), resultSet.getString("body"),
-                    userDao.findById(resultSet.getInt("to_user")), userDao.findById(resultSet.getInt("from_user")), resultSet.getDate("send_date"));
+                    userDao.findById(resultSet.getInt("to_user")), userDao.findById(resultSet.getInt("from_user")), resultSet.getTimestamp("send_date"));
     }
 
     @Override
@@ -42,8 +50,8 @@ public class LetterDaoImpl implements LetterDao {
         List<Letter> letters = new ArrayList<>();
         try(Connection connection = DBConnectionFactory.getConnection()) {
             preparedStatement = connection.prepareStatement("SELECT * FROM letters WHERE send_date BETWEEN ? AND ?");
-            preparedStatement.setDate((int)1, new java.sql.Date(start.getTime()));
-            preparedStatement.setDate((int)2, new java.sql.Date(end.getTime()));
+            preparedStatement.setTimestamp(1, new Timestamp(start.getTime()));
+            preparedStatement.setTimestamp(2, new Timestamp(end.getTime()));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 letters.add(getLetter(resultSet));
@@ -80,10 +88,10 @@ public class LetterDaoImpl implements LetterDao {
             preparedStatement.setString(2, letter.getBody());
             preparedStatement.setInt(3, letter.getTo().getId());
             preparedStatement.setInt(4, letter.getFrom().getId());
-            preparedStatement.setDate(5, new java.sql.Date(System.currentTimeMillis()));
+            preparedStatement.setTimestamp(5, letter.getTimestamp());
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.executeQuery("SELECT MAX(letter_id) FROM letters");
-            if (resultSet.next()) {
+            ResultSet resultSet = preparedStatement.executeQuery("SELECT * FROM letters");
+            while (resultSet.next()) {
                 letter.setId(resultSet.getInt("letter_id"));
             }
             //from == send && to == received
@@ -105,7 +113,7 @@ public class LetterDaoImpl implements LetterDao {
     public void update(Letter letter) {
         PreparedStatement preparedStatement = null;
         try(Connection connection = DBConnectionFactory.getConnection()) {
-            preparedStatement = connection.prepareStatement("UPDATE letters SET title = ?, body = ?, to_user = ?, from_user = ? WHERE id = ?");
+            preparedStatement = connection.prepareStatement("UPDATE letters SET title = ?, body = ?, to_user = ?, from_user = ? WHERE letter_id = ?");
             preparedStatement.setString(1, letter.getTitle());
             preparedStatement.setString(2, letter.getBody());
             preparedStatement.setInt(3, letter.getTo().getId());
@@ -123,7 +131,7 @@ public class LetterDaoImpl implements LetterDao {
         try(Connection connection = DBConnectionFactory.getConnection()) {
             //Letter letter = findById(id);
             preparedStatement = connection.prepareStatement("DELETE FROM letters WHERE letter_id = ?");
-            preparedStatement.setInt((int)1, id);
+            preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
             //from == send && to == received
         } catch (SQLException e) {
@@ -133,27 +141,24 @@ public class LetterDaoImpl implements LetterDao {
 
     @Override
     public List<Letter> allByUserLogin(String login) throws SQLException {
-        User user = userDao.find(login);
-        List<Letter> letters = allByUserId(user.getId());
-        return letters;
+        return allByUserId(userDao.find(login).getId());
     }
 
     @Override
     public List<Letter> allByUserLoginSend(String login) throws SQLException {
-        User user = userDao.find(login);
-        return allByUserIdSend(user.getId());
+        return allByUserIdSend(userDao.find(login).getId());
     }
 
     @Override
     public List<Letter> allByUserLoginReceived(String login) throws SQLException {
-        User user = userDao.find(login);
-        return allByUserId(user.getId());
+        return allByUserIdReceived(userDao.find(login).getId());
     }
 
     @Override
     public List<Letter> allByUserId(int id) throws SQLException {
         List<Letter> letters = allByUserIdHelper(id, "SELECT * FROM letters WHERE from_user = ?");
         letters.addAll(allByUserIdHelper(id, "SELECT * FROM letters WHERE to_user = ?"));
+        Collections.sort(letters, new Sort());
         return letters;
     }
 
