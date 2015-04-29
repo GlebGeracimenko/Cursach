@@ -3,6 +3,7 @@ package jmail.model;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "letters")
 @NamedQuery(name = "All_letters", query = "FROM Letter")
-public class Letter {
+public class Letter implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -21,7 +21,7 @@ import java.util.UUID;
  * Created by gleb on 07.04.15.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/app-context.xml"})
+@ContextConfiguration(locations = {"classpath:/app-context.xml"})
 public class LetterDaoHibTest {
 
     @Autowired

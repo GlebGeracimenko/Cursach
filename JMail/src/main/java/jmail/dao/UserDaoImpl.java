@@ -42,7 +42,7 @@ public class UserDaoImpl implements UserDao{
             ResultSet resultSet = statement.executeQuery();
             user = getFromResultSet(resultSet);
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return user;
     }
@@ -66,7 +66,7 @@ public class UserDaoImpl implements UserDao{
             while (resultSet.next())
                 user.setId(resultSet.getInt("user_id"));
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return user;
     }

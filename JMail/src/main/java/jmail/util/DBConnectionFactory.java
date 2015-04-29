@@ -29,6 +29,7 @@ public class DBConnectionFactory {
         if(INSTANCE == null) {
             Properties properties = new Properties();
             try {
+                Class.forName("com.mysql.jdbc.Driver");
                 properties.load(new FileInputStream("/media/gleb/10585F7C585F5F90/Универ/JMail/src/main/resources/db.properties"));
                 String host = properties.getProperty("jdbc.host");
                 String port = properties.getProperty("jdbc.port");
@@ -36,6 +37,8 @@ public class DBConnectionFactory {
                 String pass = properties.getProperty("jdbc.pass");
                 INSTANCE = new DBConnectionFactory(host, port, user, pass);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
